@@ -1,4 +1,6 @@
 import java.net.URLEncoder;
+import groovy.json.JsonSlurper;
+
 node{
 	sh "rm -rf smartFolk.csv"
 	inputFile = readFile("names.csv");
@@ -11,23 +13,22 @@ node{
 		urlFirst = URLEncoder.encode(column[0]);
 		urlLast = URLEncoder.encode(column[1]);
 
-		curl = getCMDResults("curl -i curlgoeshere.com");
+		curl = getCMDResults("curl goes here");
 
-	if(!curl.contains("HTTP/1.1 200")){
+	if(!curl.contains("error checking value goes here")){
 		echo curl;
 		echo("There was an error with the request.  Failed on line ${i+1} of the csv.");
 		System.exit(0);
 	}
 
-	if(curl.contains("mailto:")){
-		mailToTag = curl.split("mailto:");
-		endTag = mailToTag[1].split('">');
-		email = endTag[0]
-		}else{
-			email = "No Email Found";
-			echo "No email found for ${first} ${last}"
-		}
-		sh "echo ${first},${last},${email} >> smartFolk.csv"
+	def jsonSlurper = new JsonSlurper();
+	def parsedText = jsonSlurper.parseText(curl);
+	jsonSlurper = null;
+
+	String email = parsedText.jsonstructure.email;
+	parsedText = null;
+
+	sh "echo ${first},${last},${email} >> smartFolk.csv"
 	}
 }
 
