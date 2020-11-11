@@ -25,8 +25,9 @@ node{
 	def parsedText = jsonSlurper.parseText(curl);
 	jsonSlurper = null;
 
-	String email = parsedText.jsonstructure.email;
+	String email = parsedText.person.email;
 	parsedText = null;
+	email = email.substring(1,email.length()-1)
 
 	sh "echo ${first},${last},${email} >> smartFolk.csv"
 	}
